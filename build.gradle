@@ -1,23 +1,11 @@
 plugins {
   id 'java'
+  id 'checkstyle'
   id 'org.springframework.boot' version '3.2.0'
   id 'io.spring.dependency-management' version '1.1.4'
   id 'org.graalvm.buildtools.native' version '0.9.28'
-  id 'io.spring.javaformat' version '0.0.40'
+  id 'io.spring.javaformat' version "${springJavaFormatVersion}"
 }
-
-apply plugin: 'java'
-// apply plugin: 'checkstyle'
-// apply plugin: 'io.spring.javaformat'
-
-import io.spring.javaformat.gradle.SpringJavaFormatPlugin
-
-project.getPlugins()
-            .withType(SpringJavaFormatPlugin.class,
-                    (javaFormat) -> project.getGradle()
-                        .getStartParameter()
-                        .getExcludedTaskNames()
-                        .addAll(Set.of("checkFormatAot", "checkFormatAotTest")));
 
 group = 'org.springframework.samples'
 version = '3.2.0'
@@ -26,6 +14,12 @@ sourceCompatibility = '17'
 repositories {
   mavenCentral()
 }
+
+checkstyle {
+  sourceSets = [ sourceSets.main, sourceSets.test ]
+}
+
+gradle.startParameter.excludedTaskNames += [ "checkFormatAot", "checkFormatAotTest" ]
 
 ext.webjarsFontawesomeVersion = "4.7.0"
 ext.webjarsBootstrapVersion = "5.3.2"
@@ -51,8 +45,7 @@ dependencies {
   testImplementation 'org.springframework.boot:spring-boot-docker-compose'
   testImplementation 'org.testcontainers:junit-jupiter'
   testImplementation 'org.testcontainers:mysql'
-
-//  checkstyle 'io.spring.javaformat:spring-javaformat-checkstyle:0.0.40'
+  checkstyle "io.spring.javaformat:spring-javaformat-checkstyle:${springJavaFormatVersion}"
 }
 
 tasks.named('test') {
